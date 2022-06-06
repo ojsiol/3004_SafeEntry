@@ -20,7 +20,7 @@ class SafeEntryStub(object):
                 request_serializer=safeentry__pb2.Request.SerializeToString,
                 response_deserializer=safeentry__pb2.Reply.FromString,
                 )
-        self.GroupCheckin = channel.stream_unary(
+        self.GroupCheckin = channel.stream_stream(
                 '/safeentry.SafeEntry/GroupCheckin',
                 request_serializer=safeentry__pb2.Request.SerializeToString,
                 response_deserializer=safeentry__pb2.Reply.FromString,
@@ -63,7 +63,7 @@ def add_SafeEntryServicer_to_server(servicer, server):
                     request_deserializer=safeentry__pb2.Request.FromString,
                     response_serializer=safeentry__pb2.Reply.SerializeToString,
             ),
-            'GroupCheckin': grpc.stream_unary_rpc_method_handler(
+            'GroupCheckin': grpc.stream_stream_rpc_method_handler(
                     servicer.GroupCheckin,
                     request_deserializer=safeentry__pb2.Request.FromString,
                     response_serializer=safeentry__pb2.Reply.SerializeToString,
@@ -112,7 +112,7 @@ class SafeEntry(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.stream_unary(request_iterator, target, '/safeentry.SafeEntry/GroupCheckin',
+        return grpc.experimental.stream_stream(request_iterator, target, '/safeentry.SafeEntry/GroupCheckin',
             safeentry__pb2.Request.SerializeToString,
             safeentry__pb2.Reply.FromString,
             options, channel_credentials,

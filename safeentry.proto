@@ -21,7 +21,7 @@ package safeentry;
 service SafeEntry {
   //rpc Add (Request) returns (Reply) {}
   rpc Checkin (Request) returns (Reply) {}
-  rpc GroupCheckin (stream Request) returns (Reply) {}
+  rpc GroupCheckin (stream Request) returns (stream Reply) {}
   rpc History (Request)  returns (Reply) {}
 }
 

@@ -15,7 +15,6 @@
 
 from concurrent import futures
 import logging
-
 import grpc
 import safeentry_pb2
 import safeentry_pb2_grpc
@@ -53,6 +52,11 @@ class Safeentry(safeentry_pb2_grpc.SafeEntryServicer):
         storeTransactionResponse=writeSafeEntryToLogs(request.name,request.NRIC,request.location,request.type,request.datetime)
         #return transaction result as string
         return safeentry_pb2.Reply(message=storeTransactionResponse)
+    def GroupCheckin(self, request_iterator,context):
+        for request in request_iterator:   
+            storeTransactionResponse=writeSafeEntryToLogs(request.name,request.NRIC,request.location,request.type,request.datetime)
+            groupcheckin = safeentry_pb2.Reply(message=storeTransactionResponse)
+            yield groupcheckin
     def History(self, request, context):
         #reads csv file and respond transaction log as string message
         return safeentry_pb2.Reply(message=readSafeEntryLogs())

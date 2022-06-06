@@ -22,6 +22,7 @@ import safeentry_pb2
 import safeentry_pb2_grpc
 import random #Used for selecting random location for checkin
 import csv # used for persistent storage for safe entry logs
+import time #used for setting delays
 
 from datetime import datetime # Used for getting current date and time during checkin
 
@@ -41,6 +42,17 @@ def getUserCredential():
     user = Person(name,NRIC)
     return user
 
+#function for creating number of people to check in
+def Gcheckin():
+    x = int(input("Number of people"))
+    current_date_time = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+    for i in range(x):
+        Gname = input("Please enter name: ")   
+        GNRIC = input("Please enter NRIC: ")
+        response = safeentry_pb2.Request(name=Gname, NRIC=GNRIC,location=random.choice(location), type="checkin",datetime=current_date_time)
+        yield response
+        time.sleep(1)
+
 def run():
     with grpc.insecure_channel('localhost:50051') as channel:
         stub = safeentry_pb2_grpc.SafeEntryStub(channel)
@@ -54,8 +66,8 @@ def run():
         print("3. Group Check in")
 
         rpc_call = input("Choose 1 option: \n")
+        current_date_time = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
         if rpc_call == "1":
-            current_date_time = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
             #RPC call to add safeEntry transaction
             response = stub.Checkin(safeentry_pb2.Request(name=user.name, NRIC=user.NRIC,location=random.choice(location), type="checkin",datetime=current_date_time))
             print(str(response.message))
@@ -65,10 +77,12 @@ def run():
             print(str(response.message))
 
         elif rpc_call == "3":
-            # people = int(input("Number of people"))
-            # groupcheckin = stub.GroupCheckin(Gcheckin(people))
-            print("Group checkin")
-            # print(groupcheckin)
+            response = stub.Checkin(safeentry_pb2.Request(name=user.name, NRIC=user.NRIC,location=random.choice(location), type="checkin",datetime=current_date_time))
+            print(str(response.message))
+            #Call Group Check In Function
+            responses = stub.GroupCheckin(Gcheckin())
+            for x in responses:
+                print(str(x.message))
 
 
 if __name__ == '__main__':
