@@ -29,6 +29,8 @@ message Request {
   string name = 1;
   string NRIC = 2;
   string location = 3;
+  string type = 4;
+  string datetime =5;
 }
 
 // The response message containing the greetings

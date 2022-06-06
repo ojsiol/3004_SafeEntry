@@ -24,7 +24,7 @@ import safeentry_pb2_grpc
 class Safeentry(safeentry_pb2_grpc.SafeEntryServicer):
 
     def Checkin(self, request, context):
-        return safeentry_pb2.Reply(message=request.name + "  " +request.NRIC)
+        return safeentry_pb2.Reply(message=request.name + "  " +request.NRIC + "  " +request.location+ "  " +request.type+ "  " +request.datetime)
 
     # def Sub(self, request, context):
     #     #TODO: Implement Sub() procedure

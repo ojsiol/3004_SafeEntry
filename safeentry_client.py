@@ -20,7 +20,9 @@ import logging
 import grpc
 import safeentry_pb2
 import safeentry_pb2_grpc
-#TODO: import _pb2 and _pb2_grpc
+
+from datetime import datetime
+
 
 
 
@@ -31,12 +33,18 @@ def run():
     with grpc.insecure_channel('localhost:50051') as channel:
         #TODO: initiate the stub
         stub = safeentry_pb2_grpc.SafeEntryStub(channel)
-        response = stub.Checkin(safeentry_pb2.Request(name="hi", NRIC="S123567S"))
-        print("Name, NRIC: " + str(response.message))
 
-        #TODO: invoke the Sub() procedure and print the result
-        # response = stub.Sub(calculator_pb2.Request(x=5,y=6))
-        # print("The result of Sub Function is: " + str(response.res))
+        current_time = datetime.now().strftime("%H:%M:%S")
+        print("1. Check in")
+        print("2. History")
+
+        rpc_call = input("Choose 1 option: \n")
+        if rpc_call == "1":
+            response = stub.Checkin(safeentry_pb2.Request(name="hi", NRIC="S123567S",location="tampines", type="checkin",datetime=current_time))
+            print("Name, NRIC: " + str(response.message))
+        if rpc_call == "2":
+            print("History")
+
 
 
 if __name__ == '__main__':
