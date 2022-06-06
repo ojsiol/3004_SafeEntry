@@ -23,25 +23,33 @@ import safeentry_pb2_grpc
 
 from datetime import datetime
 
+# class Person:
+#   def __init__(self, name, NRIC):
+#     self.name = name
+#     self.NRIC = NRIC
 
+# def getUserCredential():
+#     name = input("Please enter name: \n")   
+#     NRIC = input("Please enter NRIC: \n")
+#     user = Person(name,NRIC)
+#     return user
 
 
 def run():
-    # NOTE(gRPC Python Team): .close() is possible on a channel and should be
-    # used in circumstances in which the with statement does not fit the needs
-    # of the code.
     with grpc.insecure_channel('localhost:50051') as channel:
         #TODO: initiate the stub
         stub = safeentry_pb2_grpc.SafeEntryStub(channel)
-
+        inputName = input("Please enter name: \n")   
+        inputNRIC = input("Please enter NRIC: \n")
         current_time = datetime.now().strftime("%H:%M:%S")
         print("1. Check in")
         print("2. History")
 
         rpc_call = input("Choose 1 option: \n")
         if rpc_call == "1":
-            response = stub.Checkin(safeentry_pb2.Request(name="hi", NRIC="S123567S",location="tampines", type="checkin",datetime=current_time))
-            print("Name, NRIC: " + str(response.message))
+            inputlocation = input("Enter current location: ")
+            response = stub.Checkin(safeentry_pb2.Request(name=inputName, NRIC=inputNRIC,location=inputlocation, type="checkin",datetime=current_time))
+            print("Name, NRIC , Location, Type \n" + str(response.message))
         if rpc_call == "2":
             print("History")
 
@@ -49,4 +57,5 @@ def run():
 
 if __name__ == '__main__':
     logging.basicConfig()
+    
     run()
