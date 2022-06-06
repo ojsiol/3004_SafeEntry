@@ -20,39 +20,47 @@ import logging
 import grpc
 import safeentry_pb2
 import safeentry_pb2_grpc
+import random #Used for selecting random location for checkin
+from datetime import datetime # Used for getting current date and time during checkin
 
-from datetime import datetime
+#location for checkin
+location = ["Bedok", "Tampines", "Pasir ris","Ang Mo Kio"]
 
-# class Person:
-#   def __init__(self, name, NRIC):
-#     self.name = name
-#     self.NRIC = NRIC
+#Person object
+class Person:
+  def __init__(self, name, NRIC):
+    self.name = name
+    self.NRIC = NRIC
 
-# def getUserCredential():
-#     name = input("Please enter name: \n")   
-#     NRIC = input("Please enter NRIC: \n")
-#     user = Person(name,NRIC)
-#     return user
+#function for creating new person
+def getUserCredential():
+    name = input("Please enter name: \n")   
+    NRIC = input("Please enter NRIC: \n")
+    user = Person(name,NRIC)
+    return user
 
 
 def run():
     with grpc.insecure_channel('localhost:50051') as channel:
-        #TODO: initiate the stub
         stub = safeentry_pb2_grpc.SafeEntryStub(channel)
-        inputName = input("Please enter name: \n")   
-        inputNRIC = input("Please enter NRIC: \n")
-        current_time = datetime.now().strftime("%H:%M:%S")
+
+        #Create new user for current checkin transaction
+        user = getUserCredential()
+        current_date_time = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+        
         print("1. Check in")
         print("2. History")
+        print("3. Group Check in")
 
         rpc_call = input("Choose 1 option: \n")
         if rpc_call == "1":
-            inputlocation = input("Enter current location: ")
-            response = stub.Checkin(safeentry_pb2.Request(name=inputName, NRIC=inputNRIC,location=inputlocation, type="checkin",datetime=current_time))
+            response = stub.Checkin(safeentry_pb2.Request(name=user.name, NRIC=user.NRIC,location=random.choice(location), type="checkin",datetime=current_date_time))
             print("Name, NRIC , Location, Type \n" + str(response.message))
         if rpc_call == "2":
             print("History")
-
+        if rpc_call == "3":
+            print("Group checkin")
+    
 
 
 if __name__ == '__main__':
