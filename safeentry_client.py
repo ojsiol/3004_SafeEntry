@@ -21,6 +21,7 @@ import grpc
 import safeentry_pb2
 import safeentry_pb2_grpc
 import random #Used for selecting random location for checkin
+import time
 from datetime import datetime # Used for getting current date and time during checkin
 
 #location for checkin
@@ -46,7 +47,6 @@ def run():
 
         #Create new user for current checkin transaction
         user = getUserCredential()
-        current_date_time = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
         
         print("1. Check in")
         print("2. History")
@@ -54,13 +54,25 @@ def run():
 
         rpc_call = input("Choose 1 option: \n")
         if rpc_call == "1":
+            current_date_time = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
             response = stub.Checkin(safeentry_pb2.Request(name=user.name, NRIC=user.NRIC,location=random.choice(location), type="checkin",datetime=current_date_time))
             print("Name, NRIC , Location, Type \n" + str(response.message))
-        if rpc_call == "2":
+        elif rpc_call == "2":
             print("History")
-        if rpc_call == "3":
+        elif rpc_call == "3":
+            # people = int(input("Number of people"))
+            # groupcheckin = stub.GroupCheckin(Gcheckin(people))
             print("Group checkin")
+            # print(groupcheckin)
     
+# def Gcheckin(x):
+#     # current_date_time = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+#     while(0>x):
+#         Gname = input("Please enter name: \n")   
+#         GNRIC = input("Please enter NRIC: \n")
+#         # response = safeentry_pb2.Checkin(safeentry_pb2.Request(name=Gname, NRIC=GNRIC,location=random.choice(location), type="checkin",datetime=current_date_time))
+#         # yield response
+#         time.sleep(1)
 
 
 if __name__ == '__main__':

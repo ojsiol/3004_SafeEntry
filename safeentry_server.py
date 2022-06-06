@@ -25,7 +25,8 @@ class Safeentry(safeentry_pb2_grpc.SafeEntryServicer):
 
     def Checkin(self, request, context):
         return safeentry_pb2.Reply(message=request.name + "  " +request.NRIC + "  " +request.location+ "  " +request.type+ "  " +request.datetime)
-
+    # def GroupCheckin(self, request,context):
+        # return safeentry_pb2.Reply(message=request.name + "  " +request.NRIC + "  " +request.location+ "  " +request.type+ "  " +request.datetime)
     # def Sub(self, request, context):
     #     #TODO: Implement Sub() procedure
     #     return calculator_pb2.Reply(res=request.x - request.y)
