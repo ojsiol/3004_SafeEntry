@@ -1,0 +1,36 @@
+	• User required to check in 
+		○ Person object
+			§ Name
+			§ NRIC
+			§ Location
+				□ Building
+					® Shopping mall
+					® Building
+					® Restaurant
+			§ Check in time
+			§ Checkout time
+	• Return GRPC status
+		○ Transaction success
+		○ Transaction failure
+	• Return Person's 
+		○ Location History for past 14 days
+	• Special remote access for MOH
+		○ Declare location of covid 19 case
+		○ Declare Time/date of covid 19 case
+	• Notify user of possible exposure for past 14 days
+		○ Suggestion to monitor health
+		○ Location
+		○ Check-in/out date/time
+	• Handle Concurrent access to service
+		○ Check in
+		○ Checkout
+		○ Request from clients
+	• Maintain safe entry log of checkin/checkout
+		○ Save/restore safe entry log to and from permanent storage
+			§ CSV???
+			§ Text?
+	• Deal with issues arising from concurrent client access to safeentry records
+	
+			
+		
+	
