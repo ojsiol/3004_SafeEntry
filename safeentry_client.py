@@ -25,7 +25,7 @@ import time
 from datetime import datetime # Used for getting current date and time during checkin
 
 #location for checkin
-location = ["Bedok", "Tampines", "Pasir ris","Ang Mo Kio"]
+location = ["Bedok", "Tampines", "Pasir ris","Ang Mo Kio","Bishan"]
 
 #Person object
 class Person:
