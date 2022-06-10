@@ -73,7 +73,7 @@ def run():
             print(str(response.message))
         elif rpc_call == "2":
             #RPC call to retrieve safeEntry Transaction History as message string
-            response = stub.History(safeentry_pb2.Request())
+            response = stub.History(safeentry_pb2.Request(name=user.name, NRIC=user.NRIC))
             print(str(response.message))
 
         elif rpc_call == "3":

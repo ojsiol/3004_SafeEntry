@@ -1,19 +1,19 @@
 	• User required to check in 
 		○ Person object
-			§ Name
-			§ NRIC
-			§ Location
-				□ Building
+			§ Name D
+			§ NRIC D
+			§ Location D
+				□ Building D
 					® Shopping mall
 					® Building
 					® Restaurant
-			§ Check in time
+			§ Check in time D
 			§ Checkout time
 	• Return GRPC status
 		○ Transaction success
 		○ Transaction failure
 	• Return Person's 
-		○ Location History for past 14 days
+		○ Location History for past 14 days D
 	• Special remote access for MOH
 		○ Declare location of covid 19 case
 		○ Declare Time/date of covid 19 case
