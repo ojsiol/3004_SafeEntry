@@ -31,15 +31,17 @@ location = ["Bedok", "Tampines", "Pasir ris","Ang Mo Kio","Bishan"]
 
 #Person object
 class Person:
-  def __init__(self, name, NRIC):
+  def __init__(self, name, NRIC,location):
     self.name = name
     self.NRIC = NRIC
+    self.location = location
 
 #function for creating new person
 def getUserCredential():
-    name = input("Please enter name: \n")   
-    NRIC = input("Please enter NRIC: \n")
-    user = Person(name,NRIC)
+    name = input("Please enter name: \n").lower()   
+    NRIC = input("Please enter NRIC: \n").lower()
+    location = input("Please enter location: \n").lower()
+    user = Person(name,NRIC,location)
     return user
 
 #function for creating number of people to check in
@@ -47,8 +49,8 @@ def Gcheckin():
     x = int(input("Number of people"))
     current_date_time = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
     for i in range(x):
-        Gname = input("Please enter name: ")   
-        GNRIC = input("Please enter NRIC: ")
+        Gname = input("Please enter name: ").lower()   
+        GNRIC = input("Please enter NRIC: ").lower()
         response = safeentry_pb2.Request(name=Gname, NRIC=GNRIC,location=random.choice(location), type="checkin",datetime=current_date_time)
         yield response
         time.sleep(1)
@@ -69,7 +71,7 @@ def run():
         current_date_time = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
         if rpc_call == "1":
             #RPC call to add safeEntry transaction
-            response = stub.Checkin(safeentry_pb2.Request(name=user.name, NRIC=user.NRIC,location=random.choice(location), type="checkin",datetime=current_date_time))
+            response = stub.Checkin(safeentry_pb2.Request(name=user.name, NRIC=user.NRIC,location=user.location, type="checkin",datetime=current_date_time))
             print(str(response.message))
         elif rpc_call == "2":
             #RPC call to retrieve safeEntry Transaction History as message string

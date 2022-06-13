@@ -48,15 +48,14 @@ def readSafeEntryLogs(name,NRIC):
         reader = csv.reader(file)
         for row in reader:
             # Match name and NRIC found in CSV
-            # if name in row[0] and NRIC in row[1]:
             if (name == row[0]) and (NRIC == row[1]):
-
+                #Convert csv Datetime to date for comparison
                 csvDate = datetime.strptime(row[4], '%d/%m/%Y %H:%M:%S').date()
+                #Compare if csv date is after T-14 days
                 if csvDate>fourteenDaysAgo:
                     # Append rows of safe entry row to response
                     response+=str(row)+"\n"
     return response
-#date_time_obj = datetime.strptime(date_time_str, '%d/%m/%Y %H:%M:%S').date()
 
 
 class Safeentry(safeentry_pb2_grpc.SafeEntryServicer):
