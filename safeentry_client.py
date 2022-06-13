@@ -16,7 +16,6 @@
 from __future__ import print_function
 
 import logging
-
 import grpc
 import safeentry_pb2
 import safeentry_pb2_grpc
@@ -65,6 +64,7 @@ def run():
         print("1. Check in")
         print("2. History")
         print("3. Group Check in")
+        print("4. Check out")
 
         rpc_call = input("Choose 1 option: \n")
         current_date_time = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
@@ -76,8 +76,7 @@ def run():
         elif rpc_call == "2":
             #RPC call to retrieve safeEntry Transaction History as message string
             response = stub.History(safeentry_pb2.Request(name=user.name, NRIC=user.NRIC))
-            print(str(response.message))
-
+            print(response.message)
         elif rpc_call == "3":
             location = input("Please enter location: ").lower()  
             response = stub.Checkin(safeentry_pb2.Request(name=user.name, NRIC=user.NRIC,location=location, type="checkin",datetime=current_date_time))
@@ -87,6 +86,11 @@ def run():
             for x in responses:
                 print(str(x.message))
 
+        elif rpc_call == "4":
+            #RPC call to retrieve safeEntry Transaction History as message string
+            response = stub.Checkout(safeentry_pb2.Request(name=user.name, NRIC=user.NRIC,datetime=current_date_time))
+            print("Which location do you wan to checkout \n")
+            print(str(response.message))
 
 if __name__ == '__main__':
     logging.basicConfig()

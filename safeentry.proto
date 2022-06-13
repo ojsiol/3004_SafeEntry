@@ -11,7 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-//python -m grpc_tools.protoc --proto_path=. safeentry.proto --python_out=. --grpc_python_out=.
+//python3 -m grpc_tools.protoc --proto_path=. safeentry.proto --python_out=. --grpc_python_out=.
 
 syntax = "proto3";
 

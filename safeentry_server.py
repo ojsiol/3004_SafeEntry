@@ -16,6 +16,7 @@
 from concurrent import futures
 from datetime import datetime,date, timedelta
 import logging
+from tkinter.tix import ROW
 import grpc
 import safeentry_pb2
 import safeentry_pb2_grpc
@@ -37,12 +38,13 @@ def writeSafeEntryToLogs(name,NRIC,location,type,datetime):
     #Return transaction details as string message
     return "Transaction Success:\nName :"+name+"\nNRIC :"+NRIC+"\nLocation :"+location+"\nType :"+type+"\nDate time :"+datetime
 
+
 #Function to read from persistent storage(csv) and respond list of transaction as string
 def readSafeEntryLogs(name,NRIC):
     #Get the date T-14 days
     fourteenDaysAgo = date.today() - timedelta(days=14)
     #Initialized empty response string
-    response = ""
+    response = []
     # open the file in the write mode
     with open('safeEntryLogs/checkinLogs.csv', 'r') as file:
         reader = csv.reader(file)
@@ -54,8 +56,66 @@ def readSafeEntryLogs(name,NRIC):
                 #Compare if csv date is after T-14 days
                 if csvDate>fourteenDaysAgo:
                     # Append rows of safe entry row to response
-                    response+=str(row)+"\n"
+                    response.append(row)
+                    # print(row)
     return response
+
+
+def checkoutfunction(name,NRIC):
+    #Stack to hold user checked in location
+    checkinLocationStack = []
+    #stack to check user checked out location
+    checkoutLocationStack =[]
+    #get entire transaction of the user
+    userHistory=readSafeEntryLogs(name,NRIC)
+    #Populate stack with current location, by subtracting checked in with checked out status
+    for row in userHistory:
+        if(row[3]=="checkin"):
+            checkinLocationStack.append(row)
+        else:
+            checkinLocationStack.pop()
+    #iterrate pending checkout location ordered by latest checked in status
+    for row in reversed(checkinLocationStack):
+        #Current time of checkin
+        date_time = str(datetime.now().strftime("%d/%m/%Y %H:%M:%S"))
+        userInput = input("checkout of "+row[2]+"?(Y/N)").lower()
+        #if user wishes to check out, create new checkout transaction and append to checkout stack
+        if(userInput == 'y'):
+            checkoutLocationStack.append([row[0],row[1],row[2],'checkout',date_time])
+        #if user cancels checkout, break out of loop 
+        elif userInput =="n":
+            print("no")
+            break
+    #Write to csv user specified checkout location.
+    for row in checkoutLocationStack:
+        writeSafeEntryToLogs(row[0],row[1],row[2],row[3],row[4])
+    return "SUCCESS"
+
+    
+def checkout(userHistory):
+    checkinLocationStack = []
+    checkoutLocationStack =[]
+    for row in userHistory:
+        if(row[3]=="checkin"):
+            checkinLocationStack.append(row)
+        else:
+            checkinLocationStack.pop()
+    for row in reversed(checkinLocationStack):
+        print(row)
+        date_time = str(datetime.now().strftime("%d/%m/%Y %H:%M:%S"))
+        userInput = input("checkout of "+row[2]+"?(Y/N)").lower()
+        if(userInput == 'y'):
+            checkoutLocationStack.append([row[0],row[1],row[2],'checkout',date_time])
+        elif userInput =="n":
+            print("no")
+            break
+    print("\n\n")
+    # for row in checkoutLocationStack:
+    #     print(row)
+
+    for row in checkoutLocationStack:
+        writeSafeEntryToLogs(row[0],row[1],row[2],row[3],row[4])
+    # return checkoutLocationStack
 
 
 class Safeentry(safeentry_pb2_grpc.SafeEntryServicer):
@@ -73,8 +133,9 @@ class Safeentry(safeentry_pb2_grpc.SafeEntryServicer):
             yield groupcheckin
     def History(self, request, context):
         #reads csv file and respond transaction log as string message
-        return safeentry_pb2.Reply(message=readSafeEntryLogs(request.name,request.NRIC))
-
+        return safeentry_pb2.Reply(message=str(readSafeEntryLogs(request.name,request.NRIC)))
+    def Checkout(self,request,context):
+        return safeentry_pb2.Reply(message=str(checkoutfunction(request.name,request.NRIC)))
 
 def serve():
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
