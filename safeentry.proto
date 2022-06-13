@@ -23,6 +23,7 @@ service SafeEntry {
   rpc Checkin (Request) returns (Reply) {}
   rpc GroupCheckin (stream Request) returns (stream Reply) {}
   rpc History (Request)  returns (Reply) {}
+  rpc Checkout (Request) returns (Reply) {}
 }
 
 // The request message containing the user's name.

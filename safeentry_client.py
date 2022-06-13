@@ -27,31 +27,30 @@ import time #used for setting delays
 from datetime import datetime # Used for getting current date and time during checkin
 
 #location for checkin
-location = ["Bedok", "Tampines", "Pasir ris","Ang Mo Kio","Bishan"]
+# location = ["Bedok", "Tampines", "Pasir ris","Ang Mo Kio","Bishan"]
 
 #Person object
 class Person:
-  def __init__(self, name, NRIC,location):
+  def __init__(self, name, NRIC):
     self.name = name
     self.NRIC = NRIC
-    self.location = location
+    # self.location = location
 
 #function for creating new person
 def getUserCredential():
     name = input("Please enter name: \n").lower()   
     NRIC = input("Please enter NRIC: \n").lower()
-    location = input("Please enter location: \n").lower()
-    user = Person(name,NRIC,location)
+    # location = input("Please enter location: \n").lower()
+    user = Person(name,NRIC)
     return user
 
 #function for creating number of people to check in
-def Gcheckin():
+def Gcheckin(location,currentdate):
     x = int(input("Number of people"))
-    current_date_time = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
     for i in range(x):
         Gname = input("Please enter name: ").lower()   
         GNRIC = input("Please enter NRIC: ").lower()
-        response = safeentry_pb2.Request(name=Gname, NRIC=GNRIC,location=random.choice(location), type="checkin",datetime=current_date_time)
+        response = safeentry_pb2.Request(name=Gname, NRIC=GNRIC,location=location, type="checkin",datetime=currentdate)
         yield response
         time.sleep(1)
 
@@ -71,7 +70,8 @@ def run():
         current_date_time = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
         if rpc_call == "1":
             #RPC call to add safeEntry transaction
-            response = stub.Checkin(safeentry_pb2.Request(name=user.name, NRIC=user.NRIC,location=user.location, type="checkin",datetime=current_date_time))
+            location = input("Please enter location: ").lower()  
+            response = stub.Checkin(safeentry_pb2.Request(name=user.name, NRIC=user.NRIC,location=location, type="checkin",datetime=current_date_time))
             print(str(response.message))
         elif rpc_call == "2":
             #RPC call to retrieve safeEntry Transaction History as message string
@@ -79,10 +79,11 @@ def run():
             print(str(response.message))
 
         elif rpc_call == "3":
-            response = stub.Checkin(safeentry_pb2.Request(name=user.name, NRIC=user.NRIC,location=random.choice(location), type="checkin",datetime=current_date_time))
+            location = input("Please enter location: ").lower()  
+            response = stub.Checkin(safeentry_pb2.Request(name=user.name, NRIC=user.NRIC,location=location, type="checkin",datetime=current_date_time))
             print(str(response.message))
             #Call Group Check In Function
-            responses = stub.GroupCheckin(Gcheckin())
+            responses = stub.GroupCheckin(Gcheckin(location,current_date_time))
             for x in responses:
                 print(str(x.message))
 

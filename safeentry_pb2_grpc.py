@@ -30,6 +30,11 @@ class SafeEntryStub(object):
                 request_serializer=safeentry__pb2.Request.SerializeToString,
                 response_deserializer=safeentry__pb2.Reply.FromString,
                 )
+        self.Checkout = channel.unary_unary(
+                '/safeentry.SafeEntry/Checkout',
+                request_serializer=safeentry__pb2.Request.SerializeToString,
+                response_deserializer=safeentry__pb2.Reply.FromString,
+                )
 
 
 class SafeEntryServicer(object):
@@ -55,6 +60,12 @@ class SafeEntryServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def Checkout(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_SafeEntryServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -70,6 +81,11 @@ def add_SafeEntryServicer_to_server(servicer, server):
             ),
             'History': grpc.unary_unary_rpc_method_handler(
                     servicer.History,
+                    request_deserializer=safeentry__pb2.Request.FromString,
+                    response_serializer=safeentry__pb2.Reply.SerializeToString,
+            ),
+            'Checkout': grpc.unary_unary_rpc_method_handler(
+                    servicer.Checkout,
                     request_deserializer=safeentry__pb2.Request.FromString,
                     response_serializer=safeentry__pb2.Reply.SerializeToString,
             ),
@@ -130,6 +146,23 @@ class SafeEntry(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/safeentry.SafeEntry/History',
+            safeentry__pb2.Request.SerializeToString,
+            safeentry__pb2.Reply.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def Checkout(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/safeentry.SafeEntry/Checkout',
             safeentry__pb2.Request.SerializeToString,
             safeentry__pb2.Reply.FromString,
             options, channel_credentials,
