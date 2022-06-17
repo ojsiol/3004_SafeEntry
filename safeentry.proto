@@ -24,6 +24,7 @@ service SafeEntry {
   rpc GroupCheckin (stream Request) returns (stream Reply) {}
   rpc History (Request)  returns (Reply) {}
   rpc Checkout (Request) returns (Reply) {}
+  rpc Covid (Request) returns (stream Reply) {}
 }
 
 // The request message containing the user's name.
@@ -39,5 +40,6 @@ message Request {
 message Reply {
   string message = 1;
 }
+
 
 

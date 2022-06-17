@@ -74,7 +74,7 @@ def checkoutfunction(name,NRIC):
             checkinLocationStack.append(row)
         else:
             checkinLocationStack.pop()
-    #iterrate pending checkout location ordered by latest checked in status
+    # iterrate pending checkout location ordered by latest checked in status
     for row in reversed(checkinLocationStack):
         #Current time of checkin
         date_time = str(datetime.now().strftime("%d/%m/%Y %H:%M:%S"))
@@ -117,6 +117,38 @@ def checkout(userHistory):
         writeSafeEntryToLogs(row[0],row[1],row[2],row[3],row[4])
     # return checkoutLocationStack
 
+#read MOH sample log
+def readMOH(datetime):
+    # f = open('safeEntryLogs/MOHLog.csv', 'a')
+    # # create the csv writer
+    # writer = csv.writer(f)
+    # # Write to csv
+    # writer.writerow(["moses","s111","amk","positive",datetime])
+    # # close the file
+    # f.close()
+    # return "success"
+    covidpeople = []
+    with open('safeEntryLogs/MOHLog.csv', 'r') as file:
+        reader = csv.reader(file)
+        for row in reader:
+            covidpeople.append(row)
+        # print(covidpeople)
+        return covidpeople
+
+def CompareLog(userlog,mohlog):
+    #compare date then location. #assume moh only has the record of 14days
+    records = []
+    for userdetail in userlog:
+        userdate = datetime.strptime(userdetail[4], '%d/%m/%Y %H:%M:%S').date()
+        for mohdetail in mohlog:
+            mohdate = datetime.strptime(mohdetail[4], '%d/%m/%Y %H:%M:%S').date()
+            #get name and nric of the person who was in close contact
+            if userdetail[2] == mohdetail[2]:
+                # records.append([userdetail[0],userdetail[2],userdetail[3],userdetail[4]])
+                message = userdetail[0] + " is in close contact with someone at "+ userdetail[2] + " around " + userdetail[4]
+                records.append(message)
+    return records
+
 
 class Safeentry(safeentry_pb2_grpc.SafeEntryServicer):
     def Checkin(self, request, context):
@@ -135,7 +167,16 @@ class Safeentry(safeentry_pb2_grpc.SafeEntryServicer):
         #reads csv file and respond transaction log as string message
         return safeentry_pb2.Reply(message=str(readSafeEntryLogs(request.name,request.NRIC)))
     def Checkout(self,request,context):
-        return safeentry_pb2.Reply(message=str(checkoutfunction(request.name,request.NRIC)))
+        return safeentry_pb2.Reply(message=(checkoutfunction(request.name,request.NRIC)))
+        
+    def Covid(self, request, context):
+        past14days = readSafeEntryLogs(request.name,request.NRIC)
+        mohdata = readMOH(request.datetime)
+        #with user past 14 days log , used it to compare with MOH Log
+        founduser = CompareLog(past14days,mohdata)
+        for i in founduser:
+            hello_reply = safeentry_pb2.Reply(message=(i))
+            yield hello_reply
 
 def serve():
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
