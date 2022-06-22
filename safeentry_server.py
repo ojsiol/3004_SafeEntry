@@ -24,7 +24,8 @@ import safeentry_pb2
 import safeentry_pb2_grpc
 import csv # used for persistent storage for safe entry logs
 
-
+import asyncio
+import functools
 
 
 #Function enabling data persistence by logging SafeEntry transactions
@@ -94,6 +95,26 @@ def CompareLog(userlog,mohlog):
                 records.append(message)
     return records
 
+def addCovidLog():
+    name = input("name of covid personnel: ")
+    nric = input("nric of covid personnel: ")
+    location = input("location of covid personnel: ")
+    f = open('safeEntryLogs/MOHLog.csv', 'a')
+    # create the csv writer
+    writer = csv.writer(f)
+    # Write to csv
+    #weian,s444,sit,positive,17/06/2022 15:22:03
+    current_date_time = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+    writer.writerow([name,nric,location,"positive",current_date_time])
+    # close the file
+    f.close()
+    print("New Record inserted")
+    return (name +" have been identified as a covid positive patient")
+# for moh officer to add d
+def MOHRemote(loop):
+    test = addCovidLog()
+    loop.run_in_executor(None, functools.partial(MOHRemote, loop))
+    return safeentry_pb2.Reply(message=test)
 
 class Safeentry(safeentry_pb2_grpc.SafeEntryServicer):
     def Checkin(self, request, context):
@@ -148,4 +169,7 @@ def serve():
 
 if __name__ == '__main__':
     logging.basicConfig()
-    serve()
+    loop = asyncio.get_event_loop()
+    loop.run_in_executor(None, functools.partial(MOHRemote, loop))
+    loop.run_in_executor(None,serve)
+    loop.run_forever()
