@@ -79,7 +79,8 @@ def readMOH(timeDelta):
     return covidLocationDate
 def CompareLog(userlog,mohlog):
     #compare date then location. #assume moh only has the record of 14days
-    potentialExposure = []
+    potentialExposureList = []
+    potentialExposure =False
     for userdetail in userlog:
         userLocation = userdetail[2]
         userdate = datetime.strptime(userdetail[4], '%d/%m/%Y %H:%M:%S').date()
@@ -91,11 +92,17 @@ def CompareLog(userlog,mohlog):
             #get name and nric of the person who was in close contact
             #user location match with moh location
             if (userLocation == mohCovidLocation) and (mohCovidDate ==userdate):
+                potentialExposure=True
                 #user date is same as moh covid date
                 # records.append([userdetail[0],userdetail[2],userdetail[3],userdetail[4]])
                 message = userdetail[0] + " is in close contact with covid positive patient during "+ userdetail[3]+ " at " + userdetail[2]+ " around " + userdetail[4]
-                potentialExposure.append(message)
-    return potentialExposure
+                potentialExposureList.append(message)
+    if potentialExposure==True:
+        potentialExposureList.append("ALERT! Please monitor health. Exposure from locations visited above during the past 14 days!")
+        return potentialExposureList
+    else:
+        potentialExposureList.append("Zero exposure of covid-19")
+        return potentialExposureList
     
 
 

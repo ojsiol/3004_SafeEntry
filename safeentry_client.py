@@ -86,16 +86,17 @@ def run():
 
         #Create new user for current checkin transaction
         user = getUserCredential()
-        
+        current_date_time = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+        response = stub.Covid(safeentry_pb2.Request(name=user.name, NRIC=user.NRIC,datetime=current_date_time))
+        for i in response:
+            print(str(i.message))
         #Display options for current user to perform
         print("1. Check in")
         print("2. History")
         print("3. Group Check in")
         print("4. Check out")
         print("5. Test to check that you are in close contact from MOH data")
-
         rpc_call = input("Choose 1 option: \n")
-        current_date_time = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
         if rpc_call == "1":
             #RPC call to add safeEntry transaction
             location = input("Please enter location: ").lower()  

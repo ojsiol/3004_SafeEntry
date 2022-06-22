@@ -1,6 +1,7 @@
 jj,s222,tampines,checkin,20/06/2022 15:57:50
 wa,s333,tampines,checkin,20/06/2022 15:57:50
 we,s444,tampines,checkin,20/06/2022 15:57:50
+ivan,s666,yck,checkin,20/06/2022 16:17:51
 jean,s555,tampines,checkin,20/06/2022 15:57:50
 mb,123,bedok,checkin,21/06/2022 15:59:16
 sl,s1,bedok,checkin,22/06/2022 15:59:44
@@ -13,3 +14,12 @@ mb,123,msia,checkin,22/06/2022 16:03:55
 mb,123,msia,checkout,22/06/2022 16:04:30
 mb,123,paris,checkout,22/06/2022 16:04:36
 mb,123,bedok,checkout,22/06/2022 16:04:37
+jj,s222,jurong,checkin,22/06/2022 16:18:47
+ivan,s666,yck,checkout,22/06/2022 16:20:15
+jj,s222,bedok,checkin,21/06/2022 16:20:22
+jj,s222,bedok,checkout,22/06/2022 16:23:05
+jj,s222,jurong,checkout,22/06/2022 16:23:06
+ivan,s666,yck,checkin,22/06/2022 16:30:03
+jj,s222,paris,checkin,22/06/2022 16:31:38
+ivan,s666,yishun,checkin,22/06/2022 16:31:53
+jj,s222,paris,checkout,22/06/2022 16:34:00
