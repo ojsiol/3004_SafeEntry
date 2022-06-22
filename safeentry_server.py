@@ -23,7 +23,6 @@ import grpc
 import safeentry_pb2
 import safeentry_pb2_grpc
 import csv # used for persistent storage for safe entry logs
-
 import asyncio
 import functools
 
@@ -64,57 +63,63 @@ def readSafeEntryLogs(name,NRIC,timeDelta):
 
 
 #read MOH sample log
-def readMOH(datetime):
-    # f = open('safeEntryLogs/MOHLog.csv', 'a')
-    # # create the csv writer
-    # writer = csv.writer(f)
-    # # Write to csv
-    # writer.writerow(["moses","s111","amk","positive",datetime])
-    # # close the file
-    # f.close()
-    # return "success"
-    covidpeople = []
+def readMOH(timeDelta):
+    #Get the date T-14 days
+    fourteenDaysAgo = date.today() - timedelta(days=timeDelta)
+    covidLocationDate = []
     with open('safeEntryLogs/MOHLog.csv', 'r') as file:
         reader = csv.reader(file)
         for row in reader:
-            covidpeople.append(row)
-        # print(covidpeople)
-        return covidpeople
-
+            #Convert csv Datetime to date for comparison
+            csvDate = datetime.strptime(row[1], '%d/%m/%Y').date()
+            #Compare if csv date is after T-14 days
+            if csvDate>fourteenDaysAgo:
+                # Append rows of safe entry row to response
+                covidLocationDate.append(row)
+    return covidLocationDate
 def CompareLog(userlog,mohlog):
     #compare date then location. #assume moh only has the record of 14days
-    records = []
+    potentialExposure = []
     for userdetail in userlog:
+        userLocation = userdetail[2]
         userdate = datetime.strptime(userdetail[4], '%d/%m/%Y %H:%M:%S').date()
-        for mohdetail in mohlog:
-            mohdate = datetime.strptime(mohdetail[4], '%d/%m/%Y %H:%M:%S').date()
+        for mohDetail in mohlog:
+            mohCovidLocation= mohDetail[0]
+            # mohCovidDate = mohDetail[1]
+            mohCovidDate = datetime.strptime(mohDetail[1], '%d/%m/%Y').date()
+            # mohdate = datetime.strptime(mohdetail[4], '%d/%m/%Y %H:%M:%S').date()
             #get name and nric of the person who was in close contact
-            if userdetail[2] == mohdetail[2]:
+            #user location match with moh location
+            if (userLocation == mohCovidLocation) and (mohCovidDate ==userdate):
+                #user date is same as moh covid date
                 # records.append([userdetail[0],userdetail[2],userdetail[3],userdetail[4]])
-                message = userdetail[0] + " is in close contact with someone at "+ userdetail[2] + " around " + userdetail[4]
-                records.append(message)
-    return records
+                message = userdetail[0] + " is in close contact with covid positive patient during "+ userdetail[3]+ " at " + userdetail[2]+ " around " + userdetail[4]
+                potentialExposure.append(message)
+    return potentialExposure
+    
+
+
+
 
 def addCovidLog():
-    name = input("name of covid personnel: ")
-    nric = input("nric of covid personnel: ")
-    location = input("location of covid personnel: ")
-    f = open('safeEntryLogs/MOHLog.csv', 'a')
+    locationOfCovid = input("Location : ")
+    dateOfCovid = input("Date(DD/MM/YYYY) : ")
+    f = open('safeEntryLogs/MOHLog.csv', 'a', newline='\n')
     # create the csv writer
     writer = csv.writer(f)
     # Write to csv
-    #weian,s444,sit,positive,17/06/2022 15:22:03
-    current_date_time = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
-    writer.writerow([name,nric,location,"positive",current_date_time])
+    # current_date_time = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+    writer.writerow([locationOfCovid,dateOfCovid])
     # close the file
     f.close()
     print("New Record inserted")
-    return (name +" have been identified as a covid positive patient")
+    return ("Location "+ locationOfCovid)
 # for moh officer to add d
 def MOHRemote(loop):
-    test = addCovidLog()
+    addCovidLog()
+    
     loop.run_in_executor(None, functools.partial(MOHRemote, loop))
-    return safeentry_pb2.Reply(message=test)
+    return safeentry_pb2.Reply(message="test")
 
 class Safeentry(safeentry_pb2_grpc.SafeEntryServicer):
     def Checkin(self, request, context):
@@ -152,12 +157,12 @@ class Safeentry(safeentry_pb2_grpc.SafeEntryServicer):
       
     def Covid(self, request, context):
         past14days = readSafeEntryLogs(request.name,request.NRIC,14)
-        mohdata = readMOH(request.datetime)
+        mohdata = readMOH(14)
         #with user past 14 days log , used it to compare with MOH Log
         founduser = CompareLog(past14days,mohdata)
         for i in founduser:
-            hello_reply = safeentry_pb2.Reply(message=(i))
-            yield hello_reply
+            covidPositiveResponse = safeentry_pb2.Reply(message=(i))
+            yield covidPositiveResponse
 
 def serve():
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))

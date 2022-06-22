@@ -15,8 +15,8 @@
 	• Return Person's 
 		○ Location History for past 14 days D
 	• Special remote access for MOH
-		○ Declare location of covid 19 case
-		○ Declare Time/date of covid 19 case
+		○ Declare location of covid 19 case D
+		○ Declare Time/date of covid 19 case D
 	• Notify user of possible exposure for past 14 days
 		○ Suggestion to monitor health
 		○ Location
@@ -25,12 +25,9 @@
 		○ Check in
 		○ Checkout
 		○ Request from clients
-	• Maintain safe entry log of checkin/checkout
+	• Maintain safe entry log of checkin/checkout D
 		○ Save/restore safe entry log to and from permanent storage
 			§ CSV???
 			§ Text?
 	• Deal with issues arising from concurrent client access to safeentry records
-	
-			
-		
 	
