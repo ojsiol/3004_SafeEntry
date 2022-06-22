@@ -42,8 +42,8 @@ def getUserCredential():
 def gCheckIn(location,currentdate):
     x = int(input("Number of people: "))
     for i in range(x):
-        Gname = input(str(i)+")Please enter name: ").lower()   
-        GNRIC = input(str(i)+")Please enter NRIC: ").lower()
+        Gname = input(str(i+1)+")Please enter name: ").lower()   
+        GNRIC = input(str(i+1)+")Please enter NRIC: ").lower()
         response = safeentry_pb2.Request(name=Gname, NRIC=GNRIC,location=location, type="checkin",datetime=currentdate)
         yield response
         time.sleep(1)
