@@ -22,13 +22,22 @@ service SafeEntry {
   //rpc Add (Request) returns (Reply) {}
   rpc Checkin (Request) returns (Reply) {}
   rpc GroupCheckin (stream Request) returns (stream Reply) {}
-  rpc History (Request)  returns (Reply) {}
-  rpc Checkout (Request) returns (Reply) {}
+  rpc History (Request)  returns (stream Response) {}
+  rpc Checkout (stream Request) returns (Reply) {}
   rpc Covid (Request) returns (stream Reply) {}
 }
 
-// The request message containing the user's name.
+// The request message containing the user transaction information to be sent to server 
 message Request {
+  string name = 1;
+  string NRIC = 2;
+  string location = 3;
+  string type = 4;
+  string datetime =5;
+}
+
+// The request message containing the user transaction information to be retrieved from server 
+message Response {
   string name = 1;
   string NRIC = 2;
   string location = 3;

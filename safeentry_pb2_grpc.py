@@ -25,12 +25,12 @@ class SafeEntryStub(object):
                 request_serializer=safeentry__pb2.Request.SerializeToString,
                 response_deserializer=safeentry__pb2.Reply.FromString,
                 )
-        self.History = channel.unary_unary(
+        self.History = channel.unary_stream(
                 '/safeentry.SafeEntry/History',
                 request_serializer=safeentry__pb2.Request.SerializeToString,
-                response_deserializer=safeentry__pb2.Reply.FromString,
+                response_deserializer=safeentry__pb2.Response.FromString,
                 )
-        self.Checkout = channel.unary_unary(
+        self.Checkout = channel.stream_unary(
                 '/safeentry.SafeEntry/Checkout',
                 request_serializer=safeentry__pb2.Request.SerializeToString,
                 response_deserializer=safeentry__pb2.Reply.FromString,
@@ -65,7 +65,7 @@ class SafeEntryServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
-    def Checkout(self, request, context):
+    def Checkout(self, request_iterator, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -90,12 +90,12 @@ def add_SafeEntryServicer_to_server(servicer, server):
                     request_deserializer=safeentry__pb2.Request.FromString,
                     response_serializer=safeentry__pb2.Reply.SerializeToString,
             ),
-            'History': grpc.unary_unary_rpc_method_handler(
+            'History': grpc.unary_stream_rpc_method_handler(
                     servicer.History,
                     request_deserializer=safeentry__pb2.Request.FromString,
-                    response_serializer=safeentry__pb2.Reply.SerializeToString,
+                    response_serializer=safeentry__pb2.Response.SerializeToString,
             ),
-            'Checkout': grpc.unary_unary_rpc_method_handler(
+            'Checkout': grpc.stream_unary_rpc_method_handler(
                     servicer.Checkout,
                     request_deserializer=safeentry__pb2.Request.FromString,
                     response_serializer=safeentry__pb2.Reply.SerializeToString,
@@ -161,14 +161,14 @@ class SafeEntry(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/safeentry.SafeEntry/History',
+        return grpc.experimental.unary_stream(request, target, '/safeentry.SafeEntry/History',
             safeentry__pb2.Request.SerializeToString,
-            safeentry__pb2.Reply.FromString,
+            safeentry__pb2.Response.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
     @staticmethod
-    def Checkout(request,
+    def Checkout(request_iterator,
             target,
             options=(),
             channel_credentials=None,
@@ -178,7 +178,7 @@ class SafeEntry(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/safeentry.SafeEntry/Checkout',
+        return grpc.experimental.stream_unary(request_iterator, target, '/safeentry.SafeEntry/Checkout',
             safeentry__pb2.Request.SerializeToString,
             safeentry__pb2.Reply.FromString,
             options, channel_credentials,

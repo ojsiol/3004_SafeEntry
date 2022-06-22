@@ -15,8 +15,10 @@
 
 from concurrent import futures
 from datetime import datetime,date, timedelta
+from email import message
 import logging
-from tkinter.tix import ROW
+from unicodedata import name
+# from tkinter.tix import ROW
 import grpc
 import safeentry_pb2
 import safeentry_pb2_grpc
@@ -27,8 +29,8 @@ import csv # used for persistent storage for safe entry logs
 
 #Function enabling data persistence by logging SafeEntry transactions
 def writeSafeEntryToLogs(name,NRIC,location,type,datetime):
-    # open the file in the write mode
-    f = open('safeEntryLogs/checkinLogs.csv', 'a')
+    # open the file in the append mode
+    f = open('safeEntryLogs/checkinLogs.csv', 'a', newline='\n')
     # create the csv writer
     writer = csv.writer(f)
     # Write to csv
@@ -40,11 +42,11 @@ def writeSafeEntryToLogs(name,NRIC,location,type,datetime):
 
 
 #Function to read from persistent storage(csv) and respond list of transaction as string
-def readSafeEntryLogs(name,NRIC):
+def readSafeEntryLogs(name,NRIC,timeDelta):
     #Get the date T-14 days
-    fourteenDaysAgo = date.today() - timedelta(days=14)
+    fourteenDaysAgo = date.today() - timedelta(days=timeDelta)
     #Initialized empty response string
-    response = []
+    transactions = []
     # open the file in the write mode
     with open('safeEntryLogs/checkinLogs.csv', 'r') as file:
         reader = csv.reader(file)
@@ -56,66 +58,68 @@ def readSafeEntryLogs(name,NRIC):
                 #Compare if csv date is after T-14 days
                 if csvDate>fourteenDaysAgo:
                     # Append rows of safe entry row to response
-                    response.append(row)
-                    # print(row)
-    return response
+                    transactions.append(row)
+    return transactions
 
 
-def checkoutfunction(name,NRIC):
-    #Stack to hold user checked in location
-    checkinLocationStack = []
-    #stack to check user checked out location
-    checkoutLocationStack =[]
-    #get entire transaction of the user
-    userHistory=readSafeEntryLogs(name,NRIC)
-    #Populate stack with current location, by subtracting checked in with checked out status
-    for row in userHistory:
-        if(row[3]=="checkin"):
-            checkinLocationStack.append(row)
-        else:
-            checkinLocationStack.pop()
-    # iterrate pending checkout location ordered by latest checked in status
-    for row in reversed(checkinLocationStack):
-        #Current time of checkin
-        date_time = str(datetime.now().strftime("%d/%m/%Y %H:%M:%S"))
-        userInput = input("checkout of "+row[2]+"?(Y/N)").lower()
-        #if user wishes to check out, create new checkout transaction and append to checkout stack
-        if(userInput == 'y'):
-            checkoutLocationStack.append([row[0],row[1],row[2],'checkout',date_time])
-        #if user cancels checkout, break out of loop 
-        elif userInput =="n":
-            print("no")
-            break
-    #Write to csv user specified checkout location.
-    for row in checkoutLocationStack:
-        writeSafeEntryToLogs(row[0],row[1],row[2],row[3],row[4])
-    return "SUCCESS"
+# def checkoutfunction(name,NRIC):
+#     #Stack to hold user checked in location
+#     checkinLocationStack = []
+#     #stack to check user checked out location
+#     checkoutLocationStack =[]
+#     #get entire transaction of the user
+#     userHistory=readSafeEntryLogs(name,NRIC,14)
+
+#     for x in userHistory:
+#         print(x)
+#     #Populate stack with current location, by subtracting checked in with checked out status
+#     for row in userHistory:
+#         if(row[3]=="checkin"):
+#             checkinLocationStack.append(row)
+#         else:
+#             checkinLocationStack.pop()
+#     # iterrate pending checkout location ordered by latest checked in status
+#     for row in reversed(checkinLocationStack):
+#         #Current time of checkin
+#         date_time = str(datetime.now().strftime("%d/%m/%Y %H:%M:%S"))
+#         userInput = input("checkout of "+row[2]+"?(Y/N)").lower()
+#         #if user wishes to check out, create new checkout transaction and append to checkout stack
+#         if(userInput == 'y'):
+#             checkoutLocationStack.append([row[0],row[1],row[2],'checkout',date_time])
+#         #if user cancels checkout, break out of loop 
+#         elif userInput =="n":
+#             print("no")
+#             break
+#     #Write to csv user specified checkout location.
+#     for row in checkoutLocationStack:
+#         writeSafeEntryToLogs(row[0],row[1],row[2],row[3],row[4])
+#     return checkoutLocationStack
 
     
-def checkout(userHistory):
-    checkinLocationStack = []
-    checkoutLocationStack =[]
-    for row in userHistory:
-        if(row[3]=="checkin"):
-            checkinLocationStack.append(row)
-        else:
-            checkinLocationStack.pop()
-    for row in reversed(checkinLocationStack):
-        print(row)
-        date_time = str(datetime.now().strftime("%d/%m/%Y %H:%M:%S"))
-        userInput = input("checkout of "+row[2]+"?(Y/N)").lower()
-        if(userInput == 'y'):
-            checkoutLocationStack.append([row[0],row[1],row[2],'checkout',date_time])
-        elif userInput =="n":
-            print("no")
-            break
-    print("\n\n")
-    # for row in checkoutLocationStack:
-    #     print(row)
+# def checkout(userHistory):
+#     checkinLocationStack = []
+#     checkoutLocationStack =[]
+#     for row in userHistory:
+#         if(row[3]=="checkin"):
+#             checkinLocationStack.append(row)
+#         else:
+#             checkinLocationStack.pop()
+#     for row in reversed(checkinLocationStack):
+#         print(row)
+#         date_time = str(datetime.now().strftime("%d/%m/%Y %H:%M:%S"))
+#         userInput = input("checkout of "+row[2]+"?(Y/N)").lower()
+#         if(userInput == 'y'):
+#             checkoutLocationStack.append([row[0],row[1],row[2],'checkout',date_time])
+#         elif userInput =="n":
+#             print("no")
+#             break
+#     print("\n\n")
+#     # for row in checkoutLocationStack:
+#     #     print(row)
 
-    for row in checkoutLocationStack:
-        writeSafeEntryToLogs(row[0],row[1],row[2],row[3],row[4])
-    # return checkoutLocationStack
+#     for row in checkoutLocationStack:
+#         writeSafeEntryToLogs(row[0],row[1],row[2],row[3],row[4])
+#     # return checkoutLocationStack
 
 #read MOH sample log
 def readMOH(datetime):
@@ -162,15 +166,30 @@ class Safeentry(safeentry_pb2_grpc.SafeEntryServicer):
             storeTransactionResponse=writeSafeEntryToLogs(request.name,request.NRIC,request.location,request.type,request.datetime)
             groupcheckin = safeentry_pb2.Reply(message=storeTransactionResponse)
             #return transaction result that can be iterated
-            yield groupcheckin
+            yield groupcheckin          
+    def Checkout(self,request_iterator,context):
+        #counter for number of locations to be checked out for user
+        rowCount =0
+        for request in request_iterator:
+            # print(request.name, request.NRIC, request.location, request.type, request.datetime)
+            writeSafeEntryToLogs(request.name,request.NRIC,request.location,request.type,request.datetime)
+            rowCount+=1
+        #if no locations to be checked out    
+        if rowCount==0:
+            return safeentry_pb2.Reply(message="Checked out of all locations")
+        #if checked out of at least one location
+        else:
+            return safeentry_pb2.Reply(message="Success, "+str(rowCount)+" rows added!")
+
     def History(self, request, context):
-        #reads csv file and respond transaction log as string message
-        return safeentry_pb2.Reply(message=str(readSafeEntryLogs(request.name,request.NRIC)))
-    def Checkout(self,request,context):
-        return safeentry_pb2.Reply(message=(checkoutfunction(request.name,request.NRIC)))
-        
+        #reads csv file and retrieve transaction logs as Array
+        transactions = readSafeEntryLogs(request.name,request.NRIC,14)
+        #Send stream of location history to client
+        for x in transactions:
+            yield safeentry_pb2.Response(name= x[0], NRIC = x[1], location = x[2], type = x[3], datetime = x[4])
+      
     def Covid(self, request, context):
-        past14days = readSafeEntryLogs(request.name,request.NRIC)
+        past14days = readSafeEntryLogs(request.name,request.NRIC,14)
         mohdata = readMOH(request.datetime)
         #with user past 14 days log , used it to compare with MOH Log
         founduser = CompareLog(past14days,mohdata)
