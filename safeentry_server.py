@@ -23,8 +23,7 @@ import grpc
 import safeentry_pb2
 import safeentry_pb2_grpc
 import csv # used for persistent storage for safe entry logs
-import asyncio 
-import functools 
+
 
 
 
@@ -63,65 +62,6 @@ def readSafeEntryLogs(name,NRIC,timeDelta):
     return transactions
 
 
-# def checkoutfunction(name,NRIC):
-#     #Stack to hold user checked in location
-#     checkinLocationStack = []
-#     #stack to check user checked out location
-#     checkoutLocationStack =[]
-#     #get entire transaction of the user
-#     userHistory=readSafeEntryLogs(name,NRIC,14)
-
-#     for x in userHistory:
-#         print(x)
-#     #Populate stack with current location, by subtracting checked in with checked out status
-#     for row in userHistory:
-#         if(row[3]=="checkin"):
-#             checkinLocationStack.append(row)
-#         else:
-#             checkinLocationStack.pop()
-#     # iterrate pending checkout location ordered by latest checked in status
-#     for row in reversed(checkinLocationStack):
-#         #Current time of checkin
-#         date_time = str(datetime.now().strftime("%d/%m/%Y %H:%M:%S"))
-#         userInput = input("checkout of "+row[2]+"?(Y/N)").lower()
-#         #if user wishes to check out, create new checkout transaction and append to checkout stack
-#         if(userInput == 'y'):
-#             checkoutLocationStack.append([row[0],row[1],row[2],'checkout',date_time])
-#         #if user cancels checkout, break out of loop 
-#         elif userInput =="n":
-#             print("no")
-#             break
-#     #Write to csv user specified checkout location.
-#     for row in checkoutLocationStack:
-#         writeSafeEntryToLogs(row[0],row[1],row[2],row[3],row[4])
-#     return checkoutLocationStack
-
-    
-# def checkout(userHistory):
-#     checkinLocationStack = []
-#     checkoutLocationStack =[]
-#     for row in userHistory:
-#         if(row[3]=="checkin"):
-#             checkinLocationStack.append(row)
-#         else:
-#             checkinLocationStack.pop()
-#     for row in reversed(checkinLocationStack):
-#         print(row)
-#         date_time = str(datetime.now().strftime("%d/%m/%Y %H:%M:%S"))
-#         userInput = input("checkout of "+row[2]+"?(Y/N)").lower()
-#         if(userInput == 'y'):
-#             checkoutLocationStack.append([row[0],row[1],row[2],'checkout',date_time])
-#         elif userInput =="n":
-#             print("no")
-#             break
-#     print("\n\n")
-#     # for row in checkoutLocationStack:
-#     #     print(row)
-
-#     for row in checkoutLocationStack:
-#         writeSafeEntryToLogs(row[0],row[1],row[2],row[3],row[4])
-#     # return checkoutLocationStack
-
 #read MOH sample log
 def readMOH(datetime):
     # f = open('safeEntryLogs/MOHLog.csv', 'a')
@@ -154,27 +94,6 @@ def CompareLog(userlog,mohlog):
                 records.append(message)
     return records
 
-def addCovidLog():
-    name = input("Name of covid personnel: ")
-    nric = input("NRIC of covid personnel: ")
-    location = input("Location of covid personnel: ")
-    f = open('safeEntryLogs/MOHLog.csv', 'a')
-    # create the csv writer
-    writer = csv.writer(f)
-    # Write to csv
-    #format sample weian,s444,sit,positive,17/06/2022 15:22:03
-    current_date_time = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
-    writer.writerow([name,nric,location,"positive",current_date_time])
-    # close the file
-    f.close()
-    print("New Record inserted")
-    return (name +" have been identified as a covid positive patient")
-
-def MOHRemote(loop):
-    test = addCovidLog()
-    #to loop the function again after execution
-    loop.run_in_executor(None, functools.partial(MOHRemote, loop))
-    return safeentry_pb2.Reply(message=test)
 
 class Safeentry(safeentry_pb2_grpc.SafeEntryServicer):
     def Checkin(self, request, context):
@@ -229,8 +148,4 @@ def serve():
 
 if __name__ == '__main__':
     logging.basicConfig()
-    #enable looping of events
-    loop = asyncio.get_event_loop()
-    loop.run_in_executor(None, functools.partial(MOHRemote, loop))
-    loop.run_in_executor(None,serve)
-    loop.run_forever()
+    serve()

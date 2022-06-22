@@ -37,8 +37,6 @@ class Person:
 def getUserCredential():
     name = input("Please enter name: \n").lower()   
     NRIC = input("Please enter NRIC: \n").lower()
-    # name = "jj"
-    # NRIC = "1"
     user = Person(name,NRIC)
     return user
 
@@ -52,12 +50,6 @@ def Gcheckin(location,currentdate):
         yield response
         time.sleep(1)
 def checkout(historyResponses):
-    # for i in historyResponses:
-    #     print("asdasd"+str(i))
-    #     # response = safeentry_pb2.Request(name="Gname", NRIC="GNRIC",location="location", type="checkin",datetime="currentdate")
-    #     # yield response
-    #     # time.sleep(1)
-
     #Stack to hold user checked in location
     checkinLocationStack = []
     #stack to check user checked out location
@@ -65,14 +57,13 @@ def checkout(historyResponses):
     #get entire transaction of the user
     userHistory=historyResponses
 
-    # for x in userHistory:
-    #     print(x.name, x.NRIC, x.location, x.type, x.datetime)
     #Populate stack with current location, by subtracting checked in with checked out status
     for row in userHistory:
         if(row.type=="checkin"):
             checkinLocationStack.append(row)
         else:
             checkinLocationStack.pop()
+
     # iterrate pending checkout location ordered by latest checked in status
     for row in reversed(checkinLocationStack):
         #Current time of checkin
@@ -87,11 +78,6 @@ def checkout(historyResponses):
         elif userInput =="n":
             print("no")
             break
-    # #Write to csv user specified checkout location.
-    # for row in checkoutLocationStack:
-    #     writeSafeEntryToLogs(row[0],row[1],row[2],row[3],row[4])
- 
-    # return checkoutLocationStack
 
 def run():
 
@@ -126,7 +112,6 @@ def run():
             response = stub.Checkin(safeentry_pb2.Request(name=user.name, NRIC=user.NRIC,location=location, type="checkin",datetime=current_date_time))
             print(str(response.message))
             #Call Group Check In Function
-            
             responses = stub.GroupCheckin(Gcheckin(location,current_date_time))
             for x in responses:
                 print(str(x.message))
@@ -136,15 +121,12 @@ def run():
             #Retrieve stream of RPC response of user location transaction
             historyResponses = stub.History(safeentry_pb2.Request(name=user.name, NRIC=user.NRIC ))
             print("Location for : "+user.name)
-            #Call function to get rows to be checked out
+            #Call function to get location to be checked out
             locationsToBeCheckedOut =checkout(historyResponses)
-            #Send a stream of rows(Request) with name,nric,location,type,datetime to server to be written to persistent storage
+            #Send a stream of checked out rows(Request) with name,nric,location,type,datetime to server to be written to persistent storage
             serverResponse = stub.Checkout(locationsToBeCheckedOut)
             #print server response
             print(serverResponse.message)
-        
-
-          
            
         elif rpc_call == "5":
             #RPC call 
