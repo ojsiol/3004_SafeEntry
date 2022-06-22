@@ -9,10 +9,10 @@
 					® Restaurant
 			§ Check in time D
 			§ Checkout time D
-	• Return GRPC status
-		○ Transaction success
-		○ Transaction failure
-	• Return Person's 
+	• Return GRPC status D 
+		○ Transaction success D
+		○ Transaction failure D
+	• Return Persons D
 		○ Location History for past 14 days D
 	• Special remote access for MOH
 		○ Declare location of covid 19 case D
@@ -22,12 +22,12 @@
 		○ Location D
 		○ Check-in/out date/time D
 	• Handle Concurrent access to service
-		○ Check in
-		○ Checkout
-		○ Request from clients
+		○ Check in ??????
+		○ Checkout ????????
+		○ Request from clients ???
 	• Maintain safe entry log of checkin/checkout D
 		○ Save/restore safe entry log to and from permanent storage D
-			§ CSV???
-			§ Text?
-	• Deal with issues arising from concurrent client access to safeentry records
+			○ CSV D 
+			○ Text?
+	• Deal with issues arising from concurrent client access to safeentry records ????
 	

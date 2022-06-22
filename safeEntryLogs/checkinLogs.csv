@@ -1,9 +1,12 @@
-jj,s2,tampines,checkin,22/06/2022 17:44:06
-wa,s3,tampines,checkin,22/06/2022 17:44:06
-we,s4,tampines,checkin,22/06/2022 17:44:06
-jn,s5,tampines,checkin,22/06/2022 17:44:06
-jj,s2,bedok,checkin,22/06/2022 17:44:06
-jj,s2,bedok,checkout,22/06/2022 17:45:45
-wa,s3,tampines,checkout,22/06/2022 17:45:59
-we,s4,tampines,checkout,22/06/2022 17:46:04
-jj,s2,tampines,checkout,22/06/2022 17:48:13
+jj,s1,bedok,checkin,22/05/2022 18:09:43
+wa,s2,bedok,checkin,22/05/2022 18:09:43
+we,s3,bedok,checkin,22/06/2022 18:09:43
+jn,s4,bedok,checkin,22/05/2022 18:09:43
+jj,s1,tampines,checkin,22/06/2022 18:10:19
+jj,s1,tampines toilet,checkin,22/06/2022 18:11:14
+wa,s2,tampines toilet,checkin,22/06/2022 18:11:14
+jj,s1,tampines toilet,checkout,22/06/2022 18:11:54
+jj,s1,tampines,checkout,22/06/2022 18:12:30
+jj,s1,bedok,checkout,22/06/2022 18:12:35
+wa,s2,tampines toilet,checkout,22/06/2022 18:12:38
+we,s3,bedok,checkout,22/06/2022 18:12:58

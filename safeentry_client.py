@@ -117,7 +117,7 @@ def run():
             current_date_time = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
             #Display options for current user to perform
             print("1. Check in")
-            print("2. History")
+            print("2. History (Past 14 days)")
             print("3. Group Check in")
             print("4. Check out")
             print("5. Group Check out")
