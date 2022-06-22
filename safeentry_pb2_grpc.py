@@ -40,6 +40,11 @@ class SafeEntryStub(object):
                 request_serializer=safeentry__pb2.Request.SerializeToString,
                 response_deserializer=safeentry__pb2.Reply.FromString,
                 )
+        self.GroupCheckout = channel.stream_stream(
+                '/safeentry.SafeEntry/GroupCheckout',
+                request_serializer=safeentry__pb2.Request.SerializeToString,
+                response_deserializer=safeentry__pb2.Reply.FromString,
+                )
 
 
 class SafeEntryServicer(object):
@@ -77,6 +82,12 @@ class SafeEntryServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def GroupCheckout(self, request_iterator, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_SafeEntryServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -102,6 +113,11 @@ def add_SafeEntryServicer_to_server(servicer, server):
             ),
             'Covid': grpc.unary_stream_rpc_method_handler(
                     servicer.Covid,
+                    request_deserializer=safeentry__pb2.Request.FromString,
+                    response_serializer=safeentry__pb2.Reply.SerializeToString,
+            ),
+            'GroupCheckout': grpc.stream_stream_rpc_method_handler(
+                    servicer.GroupCheckout,
                     request_deserializer=safeentry__pb2.Request.FromString,
                     response_serializer=safeentry__pb2.Reply.SerializeToString,
             ),
@@ -196,6 +212,23 @@ class SafeEntry(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.unary_stream(request, target, '/safeentry.SafeEntry/Covid',
+            safeentry__pb2.Request.SerializeToString,
+            safeentry__pb2.Reply.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def GroupCheckout(request_iterator,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.stream_stream(request_iterator, target, '/safeentry.SafeEntry/GroupCheckout',
             safeentry__pb2.Request.SerializeToString,
             safeentry__pb2.Reply.FromString,
             options, channel_credentials,

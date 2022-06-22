@@ -8,7 +8,7 @@
 					® Building
 					® Restaurant
 			§ Check in time D
-			§ Checkout time
+			§ Checkout time D
 	• Return GRPC status
 		○ Transaction success
 		○ Transaction failure
@@ -18,15 +18,15 @@
 		○ Declare location of covid 19 case D
 		○ Declare Time/date of covid 19 case D
 	• Notify user of possible exposure for past 14 days
-		○ Suggestion to monitor health
-		○ Location
-		○ Check-in/out date/time
+		○ Suggestion to monitor health D
+		○ Location D
+		○ Check-in/out date/time D
 	• Handle Concurrent access to service
 		○ Check in
 		○ Checkout
 		○ Request from clients
 	• Maintain safe entry log of checkin/checkout D
-		○ Save/restore safe entry log to and from permanent storage
+		○ Save/restore safe entry log to and from permanent storage D
 			§ CSV???
 			§ Text?
 	• Deal with issues arising from concurrent client access to safeentry records

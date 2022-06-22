@@ -25,6 +25,7 @@ service SafeEntry {
   rpc History (Request)  returns (stream Response) {}
   rpc Checkout (stream Request) returns (Reply) {}
   rpc Covid (Request) returns (stream Reply) {}
+  rpc GroupCheckout (stream Request) returns (stream Reply) {}
 }
 
 // The request message containing the user transaction information to be sent to server 

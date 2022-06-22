@@ -15,10 +15,7 @@
 
 from concurrent import futures
 from datetime import datetime,date, timedelta
-from email import message
 import logging
-from unicodedata import name
-# from tkinter.tix import ROW
 import grpc
 import safeentry_pb2
 import safeentry_pb2_grpc
@@ -40,7 +37,6 @@ def writeSafeEntryToLogs(name,NRIC,location,type,datetime):
     #Return transaction details as string message
     return "Transaction Success:\nName :"+name+"\nNRIC :"+NRIC+"\nLocation :"+location+"\nType :"+type+"\nDate time :"+datetime
 
-
 #Function to read from persistent storage(csv) and respond list of transaction as string
 def readSafeEntryLogs(name,NRIC,timeDelta):
     #Get the date T-14 days
@@ -61,8 +57,7 @@ def readSafeEntryLogs(name,NRIC,timeDelta):
                     transactions.append(row)
     return transactions
 
-
-#read MOH sample log
+#read MOH covid log
 def readMOH(timeDelta):
     #Get the date T-14 days
     fourteenDaysAgo = date.today() - timedelta(days=timeDelta)
@@ -77,6 +72,7 @@ def readMOH(timeDelta):
                 # Append rows of safe entry row to response
                 covidLocationDate.append(row)
     return covidLocationDate
+
 def CompareLog(userlog,mohlog):
     #compare date then location. #assume moh only has the record of 14days
     potentialExposureList = []
@@ -103,11 +99,8 @@ def CompareLog(userlog,mohlog):
     else:
         potentialExposureList.append("Zero exposure of covid-19")
         return potentialExposureList
-    
 
-
-
-
+#function to input new location and datetime to MOH log
 def addCovidLog():
     locationOfCovid = input("Location : ")
     dateOfCovid = input("Date(DD/MM/YYYY) : ")
@@ -115,16 +108,17 @@ def addCovidLog():
     # create the csv writer
     writer = csv.writer(f)
     # Write to csv
-    # current_date_time = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
     writer.writerow([locationOfCovid,dateOfCovid])
     # close the file
     f.close()
     print("New Record inserted")
     return ("Location "+ locationOfCovid)
-# for moh officer to add d
+
+#function for moh officer to add covid positive location / date
 def MOHRemote(loop):
+    #Add location and date of new covid location
     addCovidLog()
-    
+    #loop the function in asynchronous mode
     loop.run_in_executor(None, functools.partial(MOHRemote, loop))
     return safeentry_pb2.Reply(message="test")
 
@@ -134,13 +128,15 @@ class Safeentry(safeentry_pb2_grpc.SafeEntryServicer):
         storeTransactionResponse=writeSafeEntryToLogs(request.name,request.NRIC,request.location,request.type,request.datetime)
         #return transaction result as string
         return safeentry_pb2.Reply(message=storeTransactionResponse)
+
     def GroupCheckin(self, request_iterator,context):
         for request in request_iterator:   
             #store request into csv
             storeTransactionResponse=writeSafeEntryToLogs(request.name,request.NRIC,request.location,request.type,request.datetime)
             groupcheckin = safeentry_pb2.Reply(message=storeTransactionResponse)
             #return transaction result that can be iterated
-            yield groupcheckin          
+            yield groupcheckin
+
     def Checkout(self,request_iterator,context):
         #counter for number of locations to be checked out for user
         rowCount =0
@@ -163,13 +159,23 @@ class Safeentry(safeentry_pb2_grpc.SafeEntryServicer):
             yield safeentry_pb2.Response(name= x[0], NRIC = x[1], location = x[2], type = x[3], datetime = x[4])
       
     def Covid(self, request, context):
+        #retrieve the past 14days of user log
         past14days = readSafeEntryLogs(request.name,request.NRIC,14)
+        #retrieve the past 14 days of MOH log
         mohdata = readMOH(14)
         #with user past 14 days log , used it to compare with MOH Log
         founduser = CompareLog(past14days,mohdata)
         for i in founduser:
             covidPositiveResponse = safeentry_pb2.Reply(message=(i))
             yield covidPositiveResponse
+
+    def GroupCheckout(self, request_iterator, context):
+        for request in request_iterator:   
+            #store request into csv
+            storeTransactionResponse=writeSafeEntryToLogs(request.name,request.NRIC,request.location,request.type,request.datetime)
+            groupcheckout = safeentry_pb2.Reply(message=storeTransactionResponse)
+            #return transaction result that can be iterated
+            yield groupcheckout
 
 def serve():
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
